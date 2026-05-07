@@ -97,7 +97,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-      {isClicked && <Form />}
+
     </div>
   )
 }

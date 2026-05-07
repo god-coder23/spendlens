@@ -7,8 +7,12 @@ import cursor_icon from "../../assets/images/cursor-ai-code-icon.webp"
 import anthropic_icon from "../../assets/images/Anthropic-Claude.png"
 import windsurf_icon from "../../assets/images/windsurf-black-symbol.webp"
 import { ArrowRight, ChartColumnDecreasing, ChevronDown, Code, Ellipsis, GitGraph, Pen, Target, Users } from 'lucide-react'
+import { useNavigate } from "react-router-dom"
+import { nanoid } from 'nanoid'
 
 const FormAISelect = () => {
+    const navigate = useNavigate()
+    const auditId = nanoid(8)
   return (
     <div className='py-8 px-30 h-screen flex flex-col gap-5 w-screen'>
 
@@ -199,7 +203,7 @@ const FormAISelect = () => {
 
       {/* Continue Button */}
       <div className='flex justify-center items-center mt-2'>
-        <div className='w-[80%] h-fit px-1 py-3 rounded-lg bg-green-900 gap-3 flex items-center justify-center cursor-pointer'>
+        <div onClick={()=>navigate(`/audit/${auditId}`)} className='w-[80%] h-fit px-1 py-3 rounded-lg bg-green-900 gap-3 flex items-center justify-center cursor-pointer'>
           <h1 className='text-white'>Continue to audit</h1>
           <ArrowRight color='white' size={20} />
         </div>

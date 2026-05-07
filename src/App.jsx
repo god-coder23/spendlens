@@ -2,8 +2,10 @@ import React from 'react'
 import Home from './pages/Home/Home'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Form from './pages/Form/FormNavBar'
-import Result from './pages/Result/Result'
+import Result from './pages/auditResult/AuditResultNavBar'
+import { nanoid } from "nanoid"
 
+const auditId = nanoid(8)
 const App = () => {
   return (
     <div>
@@ -11,7 +13,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/audit" element={<Form />} />
-        <Route path="/result" element={<Result />} />
+        <Route path="/audit/:audit" element={<Result />} />
       </Routes>
     </BrowserRouter>
     </div>
