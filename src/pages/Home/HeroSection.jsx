@@ -1,11 +1,17 @@
 import { ArrowRight, ChartNoAxesCombined, Clock, DollarSign, Gift, SunSnowIcon } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import chatgpt_icon from "../../assets/images/chatgpt-icon.webp"
 import gemini_icon from "../../assets/images/google-gemini-icon.webp"
 import claude_icon from "../../assets/images/claude-ai.svg"
 import github_copliot_icon from "../../assets/images/github-copilot-icon.webp"
-
+import Form from '../Form/FormNavBar'
+import { useNavigate } from "react-router-dom"
 const HeroSection = () => {
+  const [isClicked, setIsClicked] = useState(false)
+  const handleButtonClick = () =>{
+    navigate("/audit")
+  }
+  const navigate = useNavigate()
   return (
     <div className='flex flex-col gap-10'>
         <div className='flex flex-row gap-0'>
@@ -25,7 +31,7 @@ const HeroSection = () => {
             <h1 className='text-gray-500 text-xl '>Get a free 2-minute audit and discover how much</h1>
             <h1 className='text-gray-500 text-xl'>you can save on AI subscriptions.</h1>
           </div>
-          <div className='flex flex-row gap-2 items-center bg-green-700 w-fit py-4 px-10 rounded-xl'>
+          <div onClick={()=>handleButtonClick()} className='flex hover:cursor-pointer flex-row gap-2 items-center bg-green-700 w-fit py-4 px-10 rounded-xl'>
             <h1 className='text-lg text-gray-100'>Audit my spend</h1>
             <ArrowRight color='#E7E7EB' />
           </div>
@@ -91,6 +97,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+      {isClicked && <Form />}
     </div>
   )
 }
