@@ -4,12 +4,19 @@ SpendLens is a lightweight AI spend audit tool for startup founders and engineer
 
 ## Demo assets
 
-- Deployed URL: `TODO: add deployed URL before submission`
-- Screen recording: `TODO: add a 30-second Loom or YouTube link`
-- Screenshot 1: `TODO: landing page`
-- Screenshot 2: `TODO: audit form`
-- Screenshot 3: `TODO: audit result page`
-
+- Deployed URL: `https://spendlens-steel.vercel.app/`
+- Screen recording:
+    Youtube Video Link: `https://youtu.be/riyKn7tnjIU`
+- Screenshot 1: 
+    ![Landing Page](src/assets/screenshots/screenshot1.png)
+- Screenshot 2: 
+    ![Audit Form](src/assets/screenshots/screenshot2.png)
+- Screenshot 3: 
+    ![Audit Form 2](src/assets/screenshots/screenshot3.png)
+- ScreenShot 4:
+    ![Audit Result 1](src/assets/screenshots/screenshot4.png)
+- ScreenShot 5:
+    ![Audit Result 2](src/assets/screenshots/screenshot5.png)
 ## What is currently implemented
 
 - Marketing landing page for the product
@@ -21,12 +28,13 @@ SpendLens is a lightweight AI spend audit tool for startup founders and engineer
 
 ## What is not complete yet
 
-- No persistent backend storage for leads or audits yet
-- No form persistence across page reloads yet
-- Share URLs currently depend on React router state, so refreshing a result page loses the audit payload
+- No persistent backend storage — audits are passed via router state, 
+  so refreshing the result page loses the audit payload
+- Share URLs are not truly persistent — the URL looks shareable but 
+  only works within the same session
 - No Open Graph metadata per audit yet
-- No automated test suite checked into the repo yet
-- Secrets are currently present in client code and must be moved to environment variables before submission
+- No automated test suite — tests are planned but not implemented
+- User interviews were not completed in time
 
 ## Quick start
 
