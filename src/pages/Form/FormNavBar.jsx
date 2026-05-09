@@ -1,35 +1,36 @@
 import { CircleArrowOutUpRight, Drone } from 'lucide-react'
-import React from 'react'
 import FormHeroSection from './FormHeroSection'
 import FormAISelect from './FormAISelect'
 
 const Form = () => {
   return (
-    <div>
-      <div className='py-3 px-10 flex flex-row justify-between'>
-        <div className='flex gap-2 px-4 items-center'>
+    <div className='min-h-screen bg-[#fafaf8]'>
+      <div className='border-b border-black/8 bg-white/90 backdrop-blur'>
+        <div className='mx-auto flex max-w-[1280px] flex-col gap-4 px-4 py-4 md:px-8 xl:flex-row xl:items-center xl:justify-between'>
+          <div className='flex items-center gap-2'>
             <CircleArrowOutUpRight size={25} color='green' />
-            <h1 className='text-xl'>SpendLens</h1>
-        </div>
-        <div className='flex flex-row items-center justify-center gap-10'>
-          <div className='flex flex-row gap-2 items-center'>
-            <h1 className='h-8 w-8 p-2 rounded-full bg-green-800 flex items-center justify-center text-white'>1</h1>
-            <h1>Welcome</h1>
-            <div className='w-20 h-[0.7px] bg-green-500 ml-3'></div>
+            <h1 className='text-xl font-semibold'>SpendLens</h1>
           </div>
-          <div className='flex flex-row gap-2 items-center'>
-            <h1 className='h-8 w-8 p-2 rounded-full bg-green-800 flex items-center justify-center text-white'>2</h1>
-            <h1 className='text-green-700'>Select your tools</h1>
-            <div className='w-20 h-[0.7px] bg-green-500 ml-3'></div>
+          <div className='flex flex-wrap items-center gap-3 text-sm md:gap-5'>
+            <div className='flex items-center gap-2'>
+              <h1 className='flex h-8 w-8 items-center justify-center rounded-full bg-green-800 text-white'>1</h1>
+              <h1 className='text-gray-700'>Welcome</h1>
+              <div className='hidden h-px w-10 bg-green-500 md:block'></div>
+            </div>
+            <div className='flex items-center gap-2'>
+              <h1 className='flex h-8 w-8 items-center justify-center rounded-full bg-green-800 text-white'>2</h1>
+              <h1 className='font-medium text-green-700'>Select your tools</h1>
+              <div className='hidden h-px w-10 bg-green-500 md:block'></div>
+            </div>
+            <div className='flex items-center gap-2'>
+              <h1 className='flex h-8 w-8 items-center justify-center rounded-full bg-green-800 text-white'>3</h1>
+              <h1 className='text-gray-700'>Get your audit</h1>
+            </div>
           </div>
-          <div className='flex flex-row gap-2 items-center'>
-            <h1 className='h-8 w-8 p-2 rounded-full bg-green-800 flex items-center justify-center text-white'>3</h1>
-            <h1>Get your audit</h1>
+          <div className='inline-flex w-fit items-center gap-2 rounded-2xl border border-black/10 px-3 py-2'>
+            <Drone color='green' size={18} />
+            <h1 className='font-semibold text-gray-800'>Why we ask</h1>
           </div>
-        </div>
-        <div className='w-fit h-fit py-1 px-3 rounded-2xl border border-black/10 flex flex-row gap-2'>
-          <Drone color='green' />
-          <h1 className='font-semibold'>Why we ask</h1>
         </div>
       </div>
       <FormHeroSection />

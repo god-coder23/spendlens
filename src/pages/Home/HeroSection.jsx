@@ -1,17 +1,14 @@
 import { ArrowRight, ChartNoAxesCombined, Clock, DollarSign, Gift, SunSnowIcon } from 'lucide-react'
-import React, { useState } from 'react'
 import chatgpt_icon from "../../assets/images/chatgpt-icon.webp"
 import gemini_icon from "../../assets/images/google-gemini-icon.webp"
 import claude_icon from "../../assets/images/claude-ai.svg"
 import github_copliot_icon from "../../assets/images/github-copilot-icon.webp"
-import Form from '../Form/FormNavBar'
 import { useNavigate } from "react-router-dom"
 const HeroSection = () => {
-  const [isClicked, setIsClicked] = useState(false)
+  const navigate = useNavigate()
   const handleButtonClick = () =>{
     navigate("/audit")
   }
-  const navigate = useNavigate()
   return (
     <div className='flex flex-col gap-10'>
         <div className='flex flex-row gap-0'>

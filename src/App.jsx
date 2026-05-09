@@ -1,11 +1,7 @@
-import React from 'react'
 import Home from './pages/Home/Home'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Form from './pages/Form/FormNavBar'
 import Result from './pages/auditResult/AuditResultNavBar'
-import { nanoid } from "nanoid"
-
-const auditId = nanoid(8)
 const App = () => {
   return (
     <div>

@@ -1,4 +1,3 @@
-import React from 'react'
 import { CircleArrowOutUpRight, MoveRight } from 'lucide-react';
 const Navbar = () => {
   return (

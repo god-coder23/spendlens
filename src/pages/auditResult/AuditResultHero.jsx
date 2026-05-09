@@ -1,273 +1,390 @@
-import { Calendar, ChevronDown, ChevronRight, CircleCheck, CircleOff, Info, Link2, Lock, Mail, ShieldCheck } from 'lucide-react'
-import React from 'react'
-import chatgpt_icon from '../../assets/images/chatgpt-icon.webp'
-import gemini_icon from '../../assets/images/google-gemini-icon.webp'
-import claude_icon from '../../assets/images/claude-ai.svg'
-import cursor_icon from '../../assets/images/cursor-ai-code-icon.webp'
+import {
+  ArrowRight,
+  BadgeDollarSign,
+  Calendar,
+  CheckCircle2,
+  Copy,
+  Info,
+  Link2,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  TriangleAlert
+} from 'lucide-react'
+import Chatgpt_icon from '../../assets/images/chatgpt-icon.webp'
+import Gemini_icon from '../../assets/images/google-gemini-icon.webp'
+import Claude_icon from '../../assets/images/claude-ai.svg'
+import Cursor_icon from '../../assets/images/cursor-ai-code-icon.webp'
+import Github_copliot_icon from '../../assets/images/github-copilot-icon.webp'
+import Anthropic_icon from '../../assets/images/Anthropic-Claude.png'
+import Windsurf_icon from '../../assets/images/windsurf-black-symbol.webp'
+import React, { useState } from 'react'
+import emailjs from "@emailjs/browser"
+const toolIconMap = {
+  ChatGPT: Chatgpt_icon,
+  Claude: Claude_icon,
+  "GitHub Copilot": Github_copliot_icon,
+  "Github Copilot": Github_copliot_icon,
+  Gemini: Gemini_icon,
+  Cursor: Cursor_icon,
+  "OpenAI API": Chatgpt_icon,
+  "Anthropic API": Anthropic_icon,
+  Windsurf: Windsurf_icon
+}
 
-const AuditResultHero = () => {
-    const recommendations = [
+const formatCurrency = (value) => {
+  const normalizedValue = Number(value) || 0
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
+  }).format(normalizedValue)
+}
+
+const formatPlanLabel = (plan) => {
+  if (!plan) return "Unknown plan"
+
+  return plan
+    .split("-")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ")
+}
+
+const formatUsageLabel = (usageType) => {
+  if (!usageType) return ""
+
+  return usageType
+    .split(" ")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ")
+}
+
+const AuditResultHero = ({ userInput, auditResult }) => {
+  const recommendations = auditResult?.recommendations || []
+  const selectedTools = userInput?.tools || []
+  const totalMonthlySavings = auditResult?.totalMonthlySavings || 0
+  const totalAnnualSavings = auditResult?.totalAnnualSavings || 0
+  const [isCopyClicked, setIsCopyClicked] = React.useState(false);
+  const [showCopied, setShowCopied] = useState(false);
+  const [email, setEmail] = useState("")
+  const shareLink = typeof window !== "undefined"
+    ? `${window.location.origin}${window.location.pathname}`
+    : "https://spendlens.com/audit"
+  const isOptimized = auditResult?.isOptimized
+  const handleCopyLink = () =>{
+    navigator.clipboard.writeText(shareLink)
+    setIsCopyClicked(true)
+    setShowCopied(true);
+    setTimeout(() => {
+        setShowCopied(false);
+    }, 1000);
+  }
+  const handleSendReport = async () =>{
+    try {
+        await emailjs.send(
+        "service_wvr7z9o",
+        "template_dtosguk",
         {
-            tool: 'Cursor',
-            detail: '1 seat',
-            image: cursor_icon,
-            plan: 'Pro',
-            price: '$20 / seat / mo',
-            spend: '$20 / month',
-            action: 'Switch to Hobby',
-            actionPrice: 'Free',
-            reason: 'Hobby includes the same core features. Perfect for solo developers.',
-            savingsMonth: '$20 / month',
-            savingsYear: '$240 / year',
-            status: 'down'
+            to_email: email,
+            monthly_savings: `$${totalMonthlySavings}`,
+            annual_savings: `$${totalAnnualSavings}`,
+            summary: auditResult?.summary,
+            audit_link: shareLink
         },
-        {
-            tool: 'ChatGPT',
-            detail: 'Team • 2 seats',
-            image: chatgpt_icon,
-            plan: 'Team',
-            price: '$25 / seat / mo',
-            spend: '$50 / month',
-            action: 'Downgrade to Plus',
-            actionPrice: '$20 / month',
-            reason: 'Team plan is overkill for under 3 users. Plus offers the same capabilities.',
-            savingsMonth: '$40 / month',
-            savingsYear: '$480 / year',
-            status: 'down'
-        },
-        {
-            tool: 'Claude',
-            detail: 'Pro • 1 seat',
-            image: claude_icon,
-            plan: 'Pro',
-            price: '$20 / seat / mo',
-            spend: '$20 / month',
-            action: 'Keep as is',
-            actionPrice: 'Optimized',
-            reason: 'Appropriate plan for your usage and team size.',
-            savingsMonth: '$0 / month',
-            savingsYear: '$0 / year',
-            status: 'keep'
-        },
-        {
-            tool: 'Gemini',
-            detail: 'Pro • 1 seat',
-            image: gemini_icon,
-            plan: 'Pro',
-            price: '$20 / seat / mo',
-            spend: '$20 / month',
-            action: 'Switch to Gemini API',
-            actionPrice: '~$6 / month',
-            reason: 'API usage fits your needs and is significantly cheaper.',
-            savingsMonth: '$14 / month',
-            savingsYear: '$168 / year',
-            status: 'switch'
-        },
-        {
-            tool: 'Anthropic API',
-            detail: 'Direct',
-            image: null,
-            plan: 'Direct',
-            price: 'Usage-based',
-            spend: '$30 / month',
-            action: 'Optimize usage',
-            actionPrice: '~$20 / month',
-            reason: 'Based on typical usage patterns, you can reduce spend by ~30%.',
-            savingsMonth: '$10 / month',
-            savingsYear: '$120 / year',
-            status: 'down'
-        }
-    ]
+        "tvn77IHi_NeRgIRBu"
+        )
 
-    return (
-        <div className='flex flex-col items-center pb-10'>
-            <div className='w-full flex justify-center items-center flex-col gap-2'>
-                <h1 className='text-4xl font-semibold mt-4'>Your AI spend audit is Ready!</h1>
-                <h1 className='text-gray-500'>Here's your personalized audit with saving opportunities.</h1>
-                <div className='flex justify-center gap-24 mt-10 border border-black/10 w-fit h-fit rounded-2xl p-6 px-12'>
-                    <div className='flex flex-row gap-10 items-center'>
-                        <div className='flex flex-col gap-2 items-center'>
-                            <h1 className='text-gray-500 font-semibold'>Total potential savings</h1>
-                            <h1 className='text-green-800 text-4xl font-semibold'>$ 1,920 <span className='text-green-800 text-2xl'>/ year</span></h1>
-                            <h1 className='text-green-800 text-sm font-semibold'>$ 160 / month <span className='text-gray-500 text-sm'>in potential savings</span></h1>
-                        </div>
-                        <div className='h-20 w-0.5 bg-black/10'></div>
-                    </div>
-                    <div className='flex flex-row gap-10 items-center'>
-                        <div className='flex flex-row gap-3 items-center'>
-                            <div className='w-fit h-fit p-2 rounded-full bg-green-500/20'>
-                                <Calendar color='green' size={30} />
-                            </div>
-                            <div className='flex flex-col gap-2'>
-                                <h1 className='text-gray-500 font-semibold'>Monthly Savings</h1>
-                                <h1 className='text-green-800 text-2xl font-semibold'>$ 160</h1>
-                            </div>
-                        </div>
-                        <div className='h-20 w-0.5 bg-black/10'></div>
-                    </div>
-                    <div className='flex flex-row gap-3 items-center'>
-                        <div className='w-fit h-fit p-2 rounded-full bg-green-500/20'>
-                            <Calendar color='green' size={30} />
-                        </div>
-                        <div className='flex flex-col gap-2'>
-                            <h1 className='text-gray-500 font-semibold'>Annual Savings</h1>
-                            <h1 className='text-green-800 text-2xl font-semibold'>$ 1,920</h1>
-                        </div>
-                    </div>
-                </div>
+        alert("Report sent")
+    }catch (error) {
+    console.log("FULL ERROR:", error)
+    console.log("STATUS:", error?.status)
+    console.log("TEXT:", error?.text)
+
+    alert(error?.text || "Failed to send")
+}
+
+  }
+  return (
+    <div className='w-full pb-14'>
+      <div className='mx-auto flex w-full max-w-[1280px] flex-col gap-8 px-4 py-6 md:px-8 xl:px-10'>
+        <section className='rounded-[32px] border border-black/8 bg-[linear-gradient(135deg,#f8fff7_0%,#ffffff_45%,#f4f7ff_100%)] p-6 md:p-8 xl:p-10'>
+          <div className='flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between'>
+            <div className='max-w-3xl'>
+              <div className='mb-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white/80 px-3 py-1.5 text-sm font-medium text-green-800'>
+                <Sparkles className='h-4 w-4' />
+                Audit complete
+              </div>
+              <h1 className='text-3xl font-semibold tracking-tight text-black md:text-5xl'>Your AI spend audit is ready</h1>
+              <p className='mt-4 max-w-2xl text-sm leading-6 text-gray-600 md:text-base'>
+                This report uses the plans, seats, monthly spend, and usage data you entered to surface practical savings opportunities without changing your team&apos;s workflow.
+              </p>
             </div>
 
-            <div className='w-[72%] mt-2 bg-green-50 rounded-lg py-3 flex items-center justify-center gap-3 text-gray-500 text-sm'>
-                <ShieldCheck size={18} color='green' />
-                <h1>Savings are estimates based on your inputs and public pricing. Results may vary.</h1>
+            <div className='grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-3'>
+              <div className='rounded-2xl border border-black/8 bg-white p-4 shadow-sm'>
+                <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-700'>
+                  <BadgeDollarSign className='h-5 w-5' />
+                </div>
+                <p className='text-sm text-gray-500'>Monthly savings</p>
+                <h2 className='mt-2 text-2xl font-semibold text-green-800'>{formatCurrency(totalMonthlySavings)}</h2>
+              </div>
+
+              <div className='rounded-2xl border border-black/8 bg-white p-4 shadow-sm'>
+                <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-700'>
+                  <Calendar className='h-5 w-5' />
+                </div>
+                <p className='text-sm text-gray-500'>Annual savings</p>
+                <h2 className='mt-2 text-2xl font-semibold text-green-800'>{formatCurrency(totalAnnualSavings)}</h2>
+              </div>
+
+              <div className='rounded-2xl border border-black/8 bg-white p-4 shadow-sm'>
+                <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-700'>
+                  <CheckCircle2 className='h-5 w-5' />
+                </div>
+                <p className='text-sm text-gray-500'>Recommendations</p>
+                <h2 className='mt-2 text-2xl font-semibold text-gray-900'>{recommendations.length}</h2>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className='grid grid-cols-1 gap-4 xl:grid-cols-[1.25fr_0.75fr]'>
+          <section className='rounded-[28px] border border-black/8 bg-white p-6 shadow-sm'>
+            <div className='flex items-start gap-3'>
+              <ShieldCheck className='mt-0.5 h-5 w-5 text-green-700' />
+              <div>
+                <h2 className='font-semibold text-gray-900'>Your audit inputs</h2>
+                <p className='mt-1 text-sm text-gray-600'>These recommendations reflect the actual tool data you entered.</p>
+              </div>
             </div>
 
-            <div className='w-[72%] mt-4'>
-                <h1 className='text-3xl font-semibold'>Recommendations</h1>
-                <h1 className='text-gray-500 text-sm'>Review tool-by-tool recommendations and potential savings.</h1>
+            <div className='mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2'>
+              {selectedTools.map((tool) => (
+                <div key={tool.tool} className='rounded-2xl border border-black/8 bg-[#fcfcfb] p-4'>
+                  <div className='flex items-start gap-3'>
+                    <img src={toolIconMap[tool.tool]} alt={tool.tool} className='h-11 w-11 rounded-xl object-contain' />
+                    <div className='min-w-0'>
+                      <h3 className='font-semibold text-gray-900'>{tool.tool}</h3>
+                      <p className='mt-1 text-sm text-gray-500'>
+                        {formatPlanLabel(tool.plan)} • {tool.seats || 1} seat{(tool.seats || 1) > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className='mt-4 flex flex-wrap gap-2'>
+                    {(tool.usageTypes || []).length > 0 ? (
+                      tool.usageTypes.map((usageType) => (
+                        <span key={usageType} className='rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800'>
+                          {formatUsageLabel(usageType)}
+                        </span>
+                      ))
+                    ) : (
+                      <span className='rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600'>No usage tags</span>
+                    )}
+                    {typeof tool.spend === "number" && tool.spend > 0 ? (
+                      <span className='rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700'>
+                        Spend {formatCurrency(tool.spend)}/mo
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className='rounded-[28px] border border-green-100 bg-green-50 p-6 shadow-sm'>
+            <div className='flex items-start gap-3'>
+              <Info className='mt-0.5 h-5 w-5 text-green-700' />
+              <div>
+                <h2 className='font-semibold text-gray-900'>Notes</h2>
+                <p className='mt-1 text-sm leading-6 text-gray-600'>
+                  Savings are estimated from your inputs and the pricing rules currently used in SpendLens. They are best treated as directional guidance for plan cleanup and cost review.
+                </p>
+              </div>
             </div>
 
-            <div className='w-[72%] mt-3'>
-                <div className='grid grid-cols-6 px-4 text-sm font-medium'>
-                    <h1>Tool</h1>
-                    <h1>Your current plan</h1>
-                    <h1>Current spend</h1>
-                    <h1>Recommended action</h1>
-                    <h1>Why this change?</h1>
-                    <h1 className='text-right'>Est. savings</h1>
-                </div>
-
-                <div className='mt-3 border border-black/10 rounded-2xl overflow-hidden'>
-                    {recommendations.map((item, index) => (
-                        <div key={index} className='grid grid-cols-6 items-center px-4 py-4 border-b last:border-b-0 border-black/10'>
-                            <div className='flex flex-row gap-3 items-center'>
-                                {item.image ? (
-                                    <img src={item.image} alt={item.tool} className='w-10 h-10 object-contain rounded-xl bg-white' />
-                                ) : (
-                                    <div className='w-10 h-10 flex items-center justify-center rounded-xl bg-white text-2xl font-semibold'>
-                                        AI
-                                    </div>
-                                )}
-                                <div className='flex flex-col'>
-                                    <h1 className='font-semibold'>{item.tool}</h1>
-                                    <h1 className='text-gray-500 text-sm'>{item.detail}</h1>
-                                </div>
-                            </div>
-
-                            <div className='flex flex-col'>
-                                <h1 className='font-semibold'>{item.plan}</h1>
-                                <h1 className='text-gray-500'>{item.price}</h1>
-                            </div>
-
-                            <div>
-                                <h1 className='font-semibold text-gray-600'>{item.spend}</h1>
-                            </div>
-
-                            <div className='flex flex-row gap-3 items-start'>
-                                <div className='mt-1'>
-                                    {item.status === 'keep' ? (
-                                        <CircleCheck size={22} color='#6B7280' fill='#E5E7EB' />
-                                    ) : item.status === 'switch' ? (
-                                        <CircleOff size={22} color='#16A34A' fill='#DCFCE7' />
-                                    ) : (
-                                        <CircleOff size={22} color='#16A34A' fill='#DCFCE7' />
-                                    )}
-                                </div>
-                                <div className='flex flex-col'>
-                                    <h1 className='font-semibold'>{item.action}</h1>
-                                    <h1 className='text-gray-500'>{item.actionPrice}</h1>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h1 className='text-gray-600'>{item.reason}</h1>
-                            </div>
-
-                            <div className='flex flex-row justify-end items-center gap-4'>
-                                <div className='flex flex-col items-end'>
-                                    <h1 className={`${item.savingsMonth === '$0 / month' ? 'text-gray-500' : 'text-green-700'} font-semibold`}>{item.savingsMonth}</h1>
-                                    <h1 className='text-gray-500'>{item.savingsYear}</h1>
-                                </div>
-                                <ChevronRight size={18} className='text-gray-500' />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className='w-full flex justify-center mt-3'>
-                    <div className='border border-black/10 rounded-xl px-8 py-2 flex flex-row items-center gap-3'>
-                        <h1 className='font-semibold text-gray-600'>Show all details</h1>
-                        <ChevronDown size={18} className='text-gray-600' />
-                    </div>
-                </div>
-            </div>
-
-            <div className='w-[72%] mt-4 grid grid-cols-3 gap-6'>
-                <div className='border border-black/10 rounded-2xl p-6 flex flex-col gap-4'>
-                    <h1 className='text-2xl font-semibold'>AI-generated summary</h1>
-                    <h1 className='text-gray-600'>
-                        Your team of 3 is paying for enterprise-grade collaboration features you're unlikely to use. By switching Cursor to Hobby, ChatGPT Team to Plus, using Gemini API, and optimizing Anthropic API usage, you can save $160 per month ($1,920 annually) with no meaningful capability loss for a coding-focused team at this size.
-                    </h1>
-                    <div className='flex flex-row gap-2 items-center text-gray-500 text-sm'>
-                        <Info size={16} />
-                        <h1>AI summary may contain mistakes. Please review recommendations.</h1>
-                    </div>
-                </div>
-
-                <div className='border border-black/10 rounded-2xl p-6 flex flex-col gap-4'>
-                    <div className='flex flex-row gap-3 items-center'>
-                        <Mail size={20} className='text-gray-600' />
-                        <h1 className='text-2xl font-semibold'>Get your full audit report</h1>
-                    </div>
-                    <h1 className='text-gray-600'>Enter your email to receive the full report with detailed breakdowns and next steps.</h1>
-                    <div className='flex flex-row gap-3'>
-                        <input type='text' placeholder='Enter your work email' className='w-full border border-black/10 rounded-xl px-4 outline-none' />
-                        <button className='bg-green-700 text-white px-6 py-3 rounded-xl font-semibold'>Get full report</button>
-                    </div>
-                    <div className='flex flex-row gap-2 items-center text-gray-500 text-sm bg-green-50 rounded-lg p-3'>
-                        <Lock size={16} color='green' />
-                        <h1>We'll email your report and keep your data private.</h1>
-                    </div>
-                </div>
-
-                <div className='border border-blue-100 bg-blue-50 rounded-2xl p-6 flex flex-col gap-4'>
-                    <div className='flex flex-row gap-3 items-center'>
-                        <Info size={20} className='text-blue-500' />
-                        <h1 className='text-2xl font-semibold'>You're spending well!</h1>
-                    </div>
-                    <h1 className='text-gray-600'>Your current stack is already well optimized. We'll notify you when new savings opportunities apply to your setup.</h1>
-                    <div className='flex flex-row gap-3'>
-                        <input type='text' placeholder='Enter your work email' className='w-full border border-black/10 bg-white rounded-xl px-4 outline-none' />
-                        <button className='bg-white border border-black/10 px-6 py-3 rounded-xl font-semibold'>Notify me</button>
-                    </div>
-                </div>
-            </div>
-
-            <div className='w-[72%] mt-6 grid grid-cols-2 border border-black/10 rounded-2xl overflow-hidden'>
-                <div className='p-6 flex flex-row justify-between items-center border-r border-black/10 gap-4'>
-                    <div className='flex flex-col'>
-                        <h1 className='text-xl font-semibold'>Share your results</h1>
-                        <h1 className='text-gray-500'>Anyone with the link can view this audit.</h1>
-                    </div>
-                    <div className='flex flex-row gap-3 items-center'>
-                        <div className='border border-black/10 rounded-xl px-4 py-3 flex flex-row gap-3 items-center'>
-                            <Link2 size={18} className='text-gray-500' />
-                            <h1 className='text-gray-600'>https://spendlens.com/audit/7f4a2b3c</h1>
-                        </div>
-                        <button className='border border-black/10 rounded-xl px-5 py-3 font-semibold'>Copy link</button>
-                    </div>
-                </div>
-
-                <div className='p-6 flex flex-row gap-3 items-start'>
-                    <ShieldCheck size={18} color='green' className='mt-1' />
-                    <div className='flex flex-col'>
-                        <h1 className='text-gray-600'>Pricing verified from official vendor pages on May 19, 2025.</h1>
-                        <h1 className='text-gray-700 font-semibold'>See sources</h1>
-                    </div>
-                </div>
-            </div>
+            {userInput?.extraInfo ? (
+              <div className='mt-5 rounded-2xl border border-green-200 bg-white/80 p-4'>
+                <p className='text-xs font-semibold uppercase tracking-[0.18em] text-green-800'>Your note</p>
+                <p className='mt-2 text-sm leading-6 text-gray-700'>{userInput.extraInfo}</p>
+              </div>
+            ) : null}
+          </section>
         </div>
-    )
+
+        <section className='rounded-[28px] border border-black/8 bg-white p-6 shadow-sm'>
+          <div className='flex flex-col gap-2 md:flex-row md:items-end md:justify-between'>
+            <div>
+              <h2 className='text-2xl font-semibold text-gray-900'>Recommendations</h2>
+              <p className='mt-1 text-sm text-gray-600'>Review each recommendation with current spend, optimized spend, and expected savings.</p>
+            </div>
+          </div>
+
+          {recommendations.length === 0 ? (
+            <div className='mt-6 rounded-3xl border border-blue-100 bg-blue-50 p-6'>
+              <div className='flex items-start gap-3'>
+                <CheckCircle2 className='mt-0.5 h-5 w-5 text-blue-600' />
+                <div>
+                  <h3 className='font-semibold text-gray-900'>Your stack already looks well optimized</h3>
+                  <p className='mt-2 text-sm leading-6 text-gray-600'>
+                    Based on the current inputs, SpendLens did not find a major plan-change opportunity. That usually means your current setup is already reasonably aligned with team size and usage.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className='mt-6 grid grid-cols-1 gap-4'>
+              {recommendations.map((item) => (
+                <article key={`${item.tool}-${item.recommendation}`} className='rounded-3xl border border-black/8 bg-[#fcfcfb] p-5'>
+                  <div className='flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between'>
+                    <div className='flex min-w-0 gap-4'>
+                      <img src={toolIconMap[item.tool]} alt={item.tool} className='h-12 w-12 rounded-2xl object-contain' />
+                      <div className='min-w-0'>
+                        <div className='flex flex-wrap items-center gap-2'>
+                          <h3 className='text-lg font-semibold text-gray-900'>{item.tool}</h3>
+                          <span className='rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700'>
+                            Current plan: {item.currentPlan}
+                          </span>
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${item.confidence === "high" ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
+                            {item.confidence} confidence
+                          </span>
+                        </div>
+                        <p className='mt-3 max-w-3xl text-sm leading-6 text-gray-600'>{item.reason}</p>
+                      </div>
+                    </div>
+
+                    <div className='rounded-2xl bg-white px-4 py-3 xl:min-w-[220px]'>
+                      <p className='text-sm text-gray-500'>Recommended action</p>
+                      <p className='mt-1 font-semibold text-gray-900'>{item.recommendation}</p>
+                    </div>
+                  </div>
+
+                  <div className='mt-5 grid grid-cols-1 gap-3 md:grid-cols-3'>
+                    <div className='rounded-2xl border border-black/8 bg-white p-4'>
+                      <p className='text-sm text-gray-500'>Current monthly spend</p>
+                      <p className='mt-2 text-xl font-semibold text-gray-900'>{formatCurrency(item.currentSpend)}</p>
+                    </div>
+
+                    <div className='rounded-2xl border border-black/8 bg-white p-4'>
+                      <p className='text-sm text-gray-500'>Optimized monthly spend</p>
+                      <p className='mt-2 text-xl font-semibold text-gray-900'>{formatCurrency(item.optimizedSpend)}</p>
+                    </div>
+
+                    <div className='rounded-2xl border border-green-200 bg-green-50 p-4'>
+                      <p className='text-sm text-green-800'>Estimated savings</p>
+                      <p className='mt-2 text-xl font-semibold text-green-800'>
+                        {formatCurrency(item.monthlySavings)}
+                        <span className='ml-1 text-sm font-medium text-green-700'>/ month</span>
+                      </p>
+                      <p className='mt-1 text-sm text-green-700'>{formatCurrency(item.annualSavings)} / year</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div className='grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]'>
+          <section className='rounded-[28px] border border-black/8 bg-white p-6 shadow-sm'>
+            <div className='flex items-start gap-3'>
+              <Sparkles className='mt-0.5 h-5 w-5 text-green-700' />
+              <div>
+                <h2 className='text-xl font-semibold text-gray-900'>AI-generated summary</h2>
+                <p className='mt-3 text-sm leading-7 text-gray-700'>
+                  {auditResult?.summary || "We generated a concise summary of your current setup and the savings opportunities identified in this audit."}
+                </p>
+              </div>
+            </div>
+            <div className='mt-4 flex items-start gap-2 rounded-2xl bg-gray-50 p-3 text-sm text-gray-500'>
+              <TriangleAlert className='mt-0.5 h-4 w-4 shrink-0' />
+              AI summaries can be imperfect, so it&apos;s worth reviewing the recommendations above before making plan changes.
+            </div>
+          </section>
+
+          <section className='rounded-[28px] border border-black/8 bg-white p-6 shadow-sm'>
+            <div className='flex items-start gap-3'>
+              <Mail className='mt-0.5 h-5 w-5 text-gray-700' />
+              <div>
+                <h2 className='text-xl font-semibold text-gray-900'>{isOptimized ? "Stay updated on future savings" : "Get your full audit report"}</h2>
+                <p className='mt-2 text-sm leading-6 text-gray-600'>
+                  {isOptimized
+                    ? "Your stack looks solid right now. Leave an email if you want future pricing or optimization updates."
+                    : "Enter your email to receive a report with the recommendations, savings summary, and next steps."}
+                </p>
+              </div>
+            </div>
+
+            <div className='mt-5 flex flex-col gap-3 sm:flex-row'>
+              <input
+                type='text'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder='Enter your work email'
+                className='h-12 w-full rounded-2xl border border-black/10 px-4 outline-none'
+                />
+              <button onClick={handleSendReport} className='inline-flex h-12 w-fit items-center justify-center gap-2 rounded-2xl bg-green-900 px-5 font-semibold text-white'>
+                {isOptimized ? "Notify me" : "Send report"}
+                <ArrowRight className='h-4 w-4' />
+              </button>
+            </div>
+
+            <div className='mt-4 flex items-start gap-2 rounded-2xl bg-green-50 p-3 text-sm text-gray-600'>
+              <Lock className='mt-0.5 h-4 w-4 shrink-0 text-green-700' />
+              We'll keep your audit data private and only use this email for your report or updates.
+            </div>
+          </section>
+        </div>
+
+        <section className='grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_0.85fr]'>
+          <div className='rounded-[28px] border border-black/8 bg-white p-6 shadow-sm'>
+            <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+              <div>
+                <h2 className='text-xl font-semibold text-gray-900'>Share your results</h2>
+                <p className='mt-1 text-sm text-gray-600'>Anyone with the link can view this audit page.</p>
+              </div>
+
+              <div className='flex flex-col gap-3 sm:flex-row'>
+                <div className='flex items-center gap-3 rounded-2xl border border-black/10 bg-[#fcfcfb] px-4 py-3 text-sm text-gray-600'>
+                  <Link2 className='h-4 w-4 shrink-0' />
+                  <span className='truncate'>{shareLink}</span>
+                </div>
+                <div className="relative">
+                    <button
+                        onClick={handleCopyLink}
+                        className={`inline-flex items-center justify-center gap-2 rounded-2xl border border-black/10 px-4 py-3 ${
+                        isCopyClicked ? "bg-green-500/30" : "bg-white"
+                        } font-medium text-gray-800`}
+                    >
+                        <Copy className='h-4 w-4' />
+                        Copy link
+                    </button>
+
+                    {showCopied && (
+                        <div className="absolute -top-12 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-xl whitespace-nowrap">
+                        Link copied
+                        </div>
+                    )}
+                    </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='rounded-[28px] border border-black/8 bg-white p-6 shadow-sm'>
+            <div className='flex items-start gap-3'>
+              <ShieldCheck className='mt-0.5 h-5 w-5 text-green-700' />
+              <div>
+                <h2 className='text-xl font-semibold text-gray-900'>Pricing note</h2>
+                <p className='mt-2 text-sm leading-6 text-gray-600'>
+                  Recommendations are based on the pricing rules currently configured in this app and the real inputs you entered for plans, seats, spend, and usage.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  )
 }
 
 export default AuditResultHero
