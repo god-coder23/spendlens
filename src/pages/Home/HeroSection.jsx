@@ -4,7 +4,7 @@ import gemini_icon from "../../assets/images/google-gemini-icon.webp"
 import claude_icon from "../../assets/images/claude-ai.svg"
 import github_copliot_icon from "../../assets/images/github-copilot-icon.webp"
 import { useNavigate } from "react-router-dom"
-const HeroSection = () => {
+const HeroSection = ({totalAnnualSavings}) => {
   const navigate = useNavigate()
   const handleButtonClick = () =>{
     navigate("/audit")
@@ -68,7 +68,7 @@ const HeroSection = () => {
               <DollarSign color='green' />
             </div>
             <div className='flex flex-col'>
-              <h1 className='text-3xl font-semibold'>$340</h1>
+              <h1 className='text-3xl font-semibold'>${360 || totalAnnualSavings}</h1>
               <h1 className='text-md text-gray-500'>Avg savings found</h1>
             </div>
             <div className='h-15 ml-10 w-[1px] bg-gray-300'></div>
