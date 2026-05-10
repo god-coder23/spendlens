@@ -25,3 +25,21 @@
 **What I learned:** Using reusable rendering methods like `.map()` reduces code duplication and makes the project easier to maintain. I also learned that integrating real APIs and handling live user data introduces practical challenges beyond static UI development.
 **Blockers / what I'm stuck on:** The Gemini AI integration still needs stronger validation and better handling for failed or unexpected API responses.
 **Plan for tomorrow:** Conduct user interviews and gather feedback on the usability, workflow, and overall experience of the product to identify areas for improvement.
+
+## Day 5 — 2026-05-10
+
+**Hours worked:** 2
+
+**What I did:**
+Focused on improving the audit recommendation flow and validating whether the product logic actually makes sense to founders outside my own assumptions. I reviewed pricing recommendation edge cases, especially around small teams overpaying for ChatGPT Team and Cursor Business plans when cheaper alternatives or API usage would fit better. I also refined the wording on the results page so the savings recommendations sound financially credible instead of sounding like generic AI hype.
+
+Spent the second half of the session doing three user interviews with people actively paying for AI tools. The goal was not validation bias, but understanding where AI spend actually becomes painful, how founders think about subscription overlap, and whether they would trust automated savings recommendations. I gathered feedback around trust, pricing transparency, and how teams decide when to downgrade or switch tools.
+
+**What I learned:**
+The interviews made it clear that most founders do not actively optimize AI spending unless costs become visibly painful. The bigger issue is usually subscription overlap and unused seats rather than one expensive tool. I also learned that users trust recommendations more when the product is willing to say their current setup is already reasonable instead of forcing unnecessary savings suggestions.
+
+**Blockers / what I'm stuck on:**
+The audit engine still needs better handling for mixed usage scenarios where teams use both subscriptions and APIs heavily. I also need to improve validation around edge cases so recommendations do not feel overly aggressive or unrealistic.
+
+**Plan for tomorrow:**
+Complete the entrepreneurial documentation files, finalize pricing source verification, and improve the AI summary fallback handling for failed API responses.
