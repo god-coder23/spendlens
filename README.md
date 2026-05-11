@@ -5,7 +5,7 @@ SpendLens is a lightweight AI spend audit tool for startup founders and engineer
 ## Demo assets
 
 - Deployed URL: `https://spendlens-steel.vercel.app/`
-- Screen recording:
+- Demo Video:
     Youtube Video Link: `https://youtu.be/riyKn7tnjIU`
 - Screenshot 1: 
     ![Landing Page](src/assets/screenshots/screenshot1.png)
@@ -34,7 +34,6 @@ SpendLens is a lightweight AI spend audit tool for startup founders and engineer
   only works within the same session
 - No Open Graph metadata per audit yet
 - No automated test suite — tests are planned but not implemented
-- User interviews were not completed in time
 
 ## Quick start
 
