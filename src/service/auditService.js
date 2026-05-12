@@ -1,14 +1,13 @@
-import { collection, addDoc, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 import { db } from "../firebase/firebase";
 
-export const saveAudit = async (auditData) => {
-  const docRef = await addDoc(
-    collection(db, "audits"),
-    auditData
-  );
+export const saveAudit = async (id, auditData) => {
+  const docRef = doc(db, "audits", id);
 
-  return docRef.id;
+  await setDoc(docRef, auditData);
+
+  return id;
 };
 
 export const getAudit = async (id) => {

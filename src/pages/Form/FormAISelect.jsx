@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom"
 import { nanoid } from 'nanoid'
 import { generateAudit } from "../../audit/generateAudit"
 import { generateSummary } from "../../api/generateSummary"
+import { saveAudit } from "../../service/auditService"
 import Loading from '../Loading'
 
 const usageOptions = [
@@ -152,7 +153,6 @@ const FormAISelect = () => {
   const [extraInfo, setExtraInfo] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const auditId = nanoid(8)
 
   const activeToolConfig = activeToolName
     ? toolConfigurations[activeToolName] || createDefaultToolConfig(activeToolName)
@@ -233,6 +233,7 @@ const FormAISelect = () => {
   const handleGenerateAudit = async () => {
     try {
       setIsLoading(true)
+      const auditId = nanoid(8)
 
       const normalizedTools = selectedTools.map((toolName) => {
         const toolConfig = toolConfigurations[toolName] || createDefaultToolConfig(toolName)
@@ -271,6 +272,11 @@ const FormAISelect = () => {
       const auditResult = generateAudit(userInput)
       const summary = await generateSummary(userInput, auditResult)
       auditResult.summary = summary
+
+      await saveAudit(auditId, {
+        auditResult,
+        userInput
+      })
 
       navigate(`/audit/${auditId}`, {
         state: {
