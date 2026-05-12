@@ -14,7 +14,7 @@ My first assumption was that the route parameter itself was broken. I checked th
 
 The thing that exposed the problem clearly was testing the app like a real user instead of a developer. A normal user would refresh, reopen, or share the link immediately. Once I tested those flows, the issue became obvious.
 
-I had already initialized Firebase and Firestore in the project, but I had not yet completed the write-and-fetch flow for audit persistence. The short-term fix was improving the fallback UI so the page failed gracefully. The proper fix is storing audits by `auditId` and hydrating the page from Firestore on load. That became the highest-priority backend task after the core frontend flow was stable.
+I had already initialized Firebase and Firestore in the project, but I had not yet completed the write-and-fetch flow for audit persistence. The short-term fix was improving the fallback UI so the page failed gracefully.The proper fix ended up being storing audits by `auditId` and hydrating the page from Firestore on load. Once that flow was implemented, shared links and refreshes started behaving like a real product instead of a temporary frontend demo. That became the highest-priority backend task after the core frontend flow was stable.
 
 ---
 
@@ -36,7 +36,7 @@ In hindsight this was the right trade-off. The core value of the product is trus
 
 If I had a second week, I would focus less on adding new frontend features and more on making the product production-ready.
 
-The first priority would be finishing backend persistence properly. Right now the product generates unique audit URLs, but the share flow still depends too heavily on route state. I would fully persist audits in Firestore and hydrate public result pages directly from the database. That would also enable proper Open Graph previews and make the sharing loop work reliably.
+The first priority would be finishing backend persistence properly. Right now the product generates unique audit URLs, but the share flow still depends too heavily on route state. I would harden the current Firestore persistence flow with stronger validation, access control, and cleanup handling so shared audit links behave reliably at production scale.
 
 The second priority would be improving pricing fidelity and recommendation depth. The current pricing catalog works well for the MVP, but I would expand the rules engine to support more edge cases, more API pricing scenarios, and better optimization logic for mixed-team usage patterns.
 

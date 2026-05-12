@@ -4,29 +4,32 @@
 
 ```mermaid
 flowchart TD
-    A[Visitor lands on marketing page] --> B[React Router]
-    B --> C[/ route]
-    B --> D[/audit route]
-    B --> E[/audit/:audit route]
+   A[Visitor lands on marketing page] --> B[React Router]
+   B --> C[/ route]
+   B --> D[/audit route]
+   B --> E[/audit/:audit route]
 
-    D --> F[FormAISelect]
-    F --> G[Normalize tool inputs]
-    G --> H[Rule-based audit engine]
-    H --> I[pricingData.js]
-    H --> J[rules.js]
-    H --> K[generateAudit.js]
+   D --> F[FormAISelect]
+   F --> G[Normalize tool inputs]
+   G --> H[Rule-based audit engine]
+   H --> I[pricingData.js]
+   H --> J[rules.js]
+   H --> K[generateAudit.js]
 
-    G --> L[generateSummary.js]
-    L --> M[Gemini model API]
-    M --> N[Summary text or fallback summary]
+   G --> L[generateSummary.js]
+   L --> M[Gemini model API]
+   M --> N[Summary text or fallback summary]
 
-    H --> O[Audit result object]
-    N --> O
-    O --> P[React Router navigate with state]
-    P --> E
-    E --> Q[AuditResultHero]
-    Q --> R[Share link]
-    Q --> S[EmailJS send report]
+   H --> O[Audit result object]
+   N --> O
+   O --> P[saveAuditToFirestore]
+   P --> Q[Firestore]
+   Q --> R[React Router navigate to /audit/:auditId]
+   R --> E
+   E --> S[Load persisted audit]
+   S --> T[AuditResultHero]
+   T --> U[Share link]
+   T --> V[EmailJS send report]
 ```
 
 ## Data flow
@@ -44,9 +47,9 @@ flowchart TD
    - a recommendation with current spend, optimized spend, monthly savings, annual savings, reason, and confidence
 6. `generateAudit()` aggregates all recommendations into a single audit result with total monthly savings, total annual savings, and a low-savings flag.
 7. `generateSummary()` sends the recommendations and totals to Gemini and asks for a short personalized audit paragraph. If that fails, the UI falls back to a generic summary.
-8. The app navigates to `/audit/:auditId` and passes `userInput` and `auditResult` through router state.
-9. `AuditResultHero.jsx` renders the result cards, breakdowns, summary, share link, and email send action.
-
+8. The generated audit is saved to Firestore using the generated `auditId`, then the app navigates to `/audit/:auditId`.
+9. The audit result page first checks router state for immediate navigation performance, then falls back to Firestore hydration so shared links and refreshes still work.
+10. `AuditResultHero.jsx` renders the result cards, breakdowns, summary, share link, and email send action.
 ## Why I chose this stack
 
 - `React`: enough structure to build a multi-step product flow quickly without locking the project into heavier conventions.
@@ -58,7 +61,7 @@ flowchart TD
 
 ## Current architectural limitations
 
-- Audit data is not persisted anywhere durable. The result page only works when route state is present.
+- Audit persistence is now implemented with Firestore, but the current implementation still needs stronger production validation, access control, and cleanup handling.
 - The LLM call currently runs from the client and exposes a secret in source code, which is not acceptable for production.
 - Lead capture is not stored in a real database yet.
 - Open Graph previews are not generated from stored audit records yet.
@@ -69,9 +72,9 @@ flowchart TD
 
 - Move audit creation to a backend API so the frontend only submits normalized form data.
 - Store audits and lead submissions in a real database such as Supabase Postgres.
-- Persist result payloads by `auditId` so public share URLs work on refresh and can power OG tags.
+- Move Firestore persistence behind a backend API layer with validation, caching, and stricter write protections.
 - Move summary generation behind a server endpoint with queueing, retries, and per-provider timeout handling.
 - Cache pricing data centrally and version it so pricing logic can be audited and updated safely.
 - Add server-side rate limiting, bot protection, and basic fraud checks on email capture.
 - Add analytics events for form completion, result views, lead conversion, and share opens.
-- Add a dedicated test suite around the audit engine and a CI gate before deploy.
+- Expand the current audit-engine test coverage and enforce stricter CI quality gates before deploy.

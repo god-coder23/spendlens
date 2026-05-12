@@ -50,17 +50,17 @@ https://youtu.be/riyKn7tnjIU
 - Email capture flow using EmailJS
 - Responsive UI optimized for desktop and mobile
 - Local persistence for form state across refreshes
-
+- Firestore-backed audit persistence and shared audit hydration
 ---
 
 ## Current limitations
 
-- Audit persistence is partially implemented and is the next backend priority
-- Public share URLs currently depend on stored route state instead of database hydration
+- Audit persistence now works through Firestore-backed hydration, but the current implementation still needs stronger production validation, cleanup handling, and access controls
+- Public share URLs currently depend on database hydration and still need stronger production validation
 - Open Graph metadata per audit is not implemented yet
 - API requests currently use client-side environment variables suitable for a prototype but not production
-- Automated tests and CI setup are documented but still in progress
-
+- Test coverage currently focuses only on the audit engine and is still limited relative to a production-grade system
+ 
 ---
 
 ## Tech Stack
@@ -69,7 +69,7 @@ https://youtu.be/riyKn7tnjIU
 - Vite
 - JavaScript
 - Tailwind CSS
-- Firebase
+- Firebase Firestore
 - Gemini API
 - EmailJS
 
