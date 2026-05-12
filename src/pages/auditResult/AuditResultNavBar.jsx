@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { CircleArrowOutUpRight, Drone, MoveLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import AuditResultHero from './AuditResultHero'

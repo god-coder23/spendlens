@@ -1,73 +1,83 @@
 # SpendLens
 
-SpendLens is a lightweight AI spend audit tool for startup founders and engineering leads who pay for multiple AI subscriptions but do not have a clear benchmark for whether their stack is efficient. A user picks the tools they use, enters plan, seat, and spend details, and gets an instant audit with savings estimates, per-tool recommendations, a generated summary, and a shareable result page.
+SpendLens is an AI spend audit tool for startup founders and engineering leads who use multiple AI products but do not have a clear benchmark for whether their stack is cost-efficient. Users enter the AI tools they pay for, their plans, team size, and monthly spend, then receive an instant audit with savings opportunities, downgrade suggestions, and a personalized summary.
 
-## Demo assets
+The project is designed as both a genuinely useful budgeting tool and a lead-generation product for AI infrastructure resellers like Credex.
 
-- Deployed URL: `https://spendlens-steel.vercel.app/`
-- Demo Video:
-    Youtube Video Link: `https://youtu.be/riyKn7tnjIU`
-- Screenshot 1: 
-    ![Landing Page](src/assets/screenshots/screenshot1.png)
-- Screenshot 2: 
-    ![Audit Form](src/assets/screenshots/screenshot2.png)
-- Screenshot 3: 
-    ![Audit Form 2](src/assets/screenshots/screenshot3.png)
-- ScreenShot 4:
-    ![Audit Result 1](src/assets/screenshots/screenshot4.png)
-- ScreenShot 5:
-    ![Audit Result 2](src/assets/screenshots/screenshot5.png)
-## What is currently implemented
+---
 
-- Marketing landing page for the product
-- Multi-tool audit form for ChatGPT, Claude, GitHub Copilot, Gemini, Cursor, OpenAI API, Anthropic API, and Windsurf
-- Rule-based audit engine for plan downgrade and spend-gap recommendations
-- AI-generated summary with a templated fallback path
-- Firestore-backed shareable result route using a generated audit identifier in the URL
-- Email send flow from the result page using EmailJS
+## Live Demo
 
-## What is not complete yet
+Deployed URL:  
+https://spendlens-steel.vercel.app/
 
-- Lead capture is not stored in a real backend yet
+Demo Video:  
+https://youtu.be/riyKn7tnjIU
+
+---
+
+## Screenshots
+
+### Landing Page
+![Landing Page](src/assets/screenshots/screenshot1.png)
+
+### Audit Form
+![Audit Form](src/assets/screenshots/screenshot2.png)
+
+### Audit Results
+![Audit Results](src/assets/screenshots/screenshot4.png)
+
+---
+
+## Features
+
+### Implemented
+
+- Marketing landing page
+- Multi-tool AI spend audit form
+- Support for:
+  - ChatGPT
+  - Claude
+  - Cursor
+  - GitHub Copilot
+  - Gemini
+  - OpenAI API
+  - Anthropic API
+  - Windsurf
+- Rule-based audit engine with plan downgrade and spend optimization logic
+- Personalized AI-generated audit summary with fallback handling
+- Unique audit IDs and result routes
+- Email capture flow using EmailJS
+- Responsive UI optimized for desktop and mobile
+- Local persistence for form state across refreshes
+
+---
+
+## Current limitations
+
+- Audit persistence is partially implemented and is the next backend priority
+- Public share URLs currently depend on stored route state instead of database hydration
 - Open Graph metadata per audit is not implemented yet
-- Secrets and AI integrations still run client-side, which is acceptable for a prototype but not for production
-- No automated test suite — tests are planned but not implemented
+- API requests currently use client-side environment variables suitable for a prototype but not production
+- Automated tests and CI setup are documented but still in progress
 
-## Quick start
+---
+
+## Tech Stack
+
+- React
+- Vite
+- JavaScript
+- Tailwind CSS
+- Firebase
+- Gemini API
+- EmailJS
+
+---
+
+## Quick Start
 
 ### Install
 
 ```bash
 npm install
-```
-
-### Run locally
-
-```bash
-npm run dev
-```
-
-### Build for production
-
-```bash
-npm run build
-```
-
-### Deploy
-
-This project is a Vite React SPA and can be deployed to Vercel, Netlify, Cloudflare Pages, or Render as a static frontend. Before deploying, move API keys and email credentials to environment variables and replace the temporary client-side integrations with a server-backed flow.
-
-## Decisions
-
-1. I used `React + Vite` because the assignment rewards shipping speed, iteration, and clean component-based UI more than framework ceremony. Vite kept setup minimal and made it easy to focus on the product flow.
-2. I kept the audit math rule-based instead of LLM-generated because the assignment explicitly asks for defensible pricing logic. Deterministic rules are easier to inspect, test, and explain to a finance-literate reviewer.
-3. I collected `per-tool plan, seats, spend, and usage tags` rather than asking for one big monthly AI budget. That makes the recommendations more actionable and supports per-tool breakdowns on the result page.
-4. I generated the personalized summary separately from the pricing engine so the audit math remains deterministic even if the model fails. The UI can still show a useful result with the fallback summary.
-5. I made the result page highly visual because it is the part most likely to get screenshotted, shared, or used as a sales conversation starter. The assignment is clear that this page matters as much as the calculation itself.
-
-## Notes for final submission
-
-- Add the real deployed URL and demo assets above
-- Replace all hardcoded secrets with environment variables
-- Move audit and lead persistence behind a server-backed flow
-- Add tests and CI before calling the project submission-ready

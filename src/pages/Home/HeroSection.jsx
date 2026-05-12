@@ -68,7 +68,7 @@ const HeroSection = ({totalAnnualSavings}) => {
               <DollarSign color='green' />
             </div>
             <div className='flex flex-col'>
-              <h1 className='text-3xl font-semibold'>${360 || totalAnnualSavings}</h1>
+              <h1 className='text-3xl font-semibold'>${totalAnnualSavings || 360}</h1>
               <h1 className='text-md text-gray-500'>Avg savings found</h1>
             </div>
             <div className='h-15 ml-10 w-[1px] bg-gray-300'></div>

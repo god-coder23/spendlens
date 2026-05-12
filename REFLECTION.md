@@ -1,58 +1,83 @@
+
+---
+
+# REFLECTION.md
+
+```md
 # Reflection
 
 ## 1. The hardest bug I hit this week, and how I debugged it
 
-The hardest bug was not a crashing error. It was a product bug hidden inside the routing model: the audit result page looked correct when I navigated to it from the form, but the data disappeared on refresh because the page depended entirely on `react-router-dom` navigation state. At first I treated it like a rendering problem because the UI fell back to an “Audit data not found” state. My first hypothesis was that I had a mismatch in the route param or that the audit ID was not being passed correctly. I traced the navigation from `FormAISelect.jsx` into `/audit/:audit` and confirmed that the route param itself was fine.
+The hardest bug was related to the audit results page disappearing after a browser refresh. Initially the feature looked complete because the audit page worked correctly when navigating from the form flow. But when I copied the URL into a new tab or refreshed the page, the audit data disappeared and the UI fell back to an error state.
 
-The next hypothesis was that I was generating the result correctly but not storing it anywhere durable. I checked `navigate()` and saw that I was only passing `auditResult` and `userInput` through `location.state`. That explained why the page worked in-session and failed after refresh or when opened from a copied link: the URL looked shareable, but the payload only existed in memory. The thing that finally made the bug obvious was testing the flow exactly like a real user would: generate report, copy URL, open a fresh tab, refresh. Once I did that, the problem stopped looking like a React issue and started looking like an architecture issue. The immediate fix was to render a graceful fallback message; the real fix is to persist audits by `auditId` in a backend and hydrate the result page from storage.
+My first assumption was that the route parameter itself was broken. I checked the audit ID generation logic and verified that the route path was being constructed correctly. After tracing the navigation flow more carefully, I realized the issue was architectural rather than visual: the page depended entirely on `react-router-dom` route state. The audit result existed only in memory after navigation and was never persisted anywhere durable.
 
-## 2 Why I used JavaScript instead of TypeScript
+The thing that exposed the problem clearly was testing the app like a real user instead of a developer. A normal user would refresh, reopen, or share the link immediately. Once I tested those flows, the issue became obvious.
 
-I chose JavaScript for speed of iteration during the 7-day assignment window. My priority was shipping a complete end-to-end product flow with working audit logic, UI polish, and deployment rather than spending additional time defining and maintaining TypeScript types across rapidly changing components and pricing schemas.
+I had already initialized Firebase and Firestore in the project, but I had not yet completed the write-and-fetch flow for audit persistence. The short-term fix was improving the fallback UI so the page failed gracefully. The proper fix is storing audits by `auditId` and hydrating the page from Firestore on load. That became the highest-priority backend task after the core frontend flow was stable.
 
-The project structure still keeps concerns separated (`audit`, `components`, `pages`, `api`) so migrating to TypeScript later would be straightforward. If this were moving beyond MVP stage or supporting a larger team, I would switch to TypeScript for stronger type safety around pricing data, audit result objects, and API responses.
+---
 
-## 3. A decision I reversed mid-week, and what made me reverse it
+## 2. A decision I reversed mid-week, and what made me reverse it
 
-The biggest decision I reversed was how much of the recommendation logic should be “smart” versus explicit. My earliest instinct was to let an LLM do more of the reasoning because the assignment is about AI tooling and the result page benefits from personalized language. But once I reread the prompt carefully, it became clear that the assignment was testing judgment, not just AI usage. It explicitly says the audit math itself should be hardcoded and defensible, and that knowing when not to use AI is part of the test.
+The biggest decision I reversed was how much of the recommendation engine should rely on AI-generated reasoning. My first instinct was to let the language model handle more of the optimization logic because the assignment revolves around AI tooling and personalized recommendations.
 
-That changed my approach. Instead of asking a model to infer whether a plan was too expensive, I moved the core audit into deterministic rules inside `src/audit/rules.js`. For example, small teams on ChatGPT Team or Cursor Business can be mapped to cheaper options in a way that is easy to inspect and easy to challenge. I kept the LLM only for the ~100-word summary layer. That reversal improved the product in two ways. First, it made the savings logic explainable. Second, it made the failure mode better because a model outage no longer breaks the audit itself. In hindsight, this was the right reversal because the most important part of the app is not sounding intelligent, but producing recommendations that a finance-minded person would trust.
+After rereading the assignment more carefully, I realized that was the wrong direction. The prompt repeatedly emphasizes that the audit logic itself should be defensible and rule-based, and that understanding when not to use AI is part of the evaluation.
 
-## 4. What I would build in week 2 if I had it
+That changed the architecture of the app significantly. I moved the pricing and recommendation logic into deterministic rules inside the audit engine. Each rule compares plans, seats, and estimated usage against pricing data collected from official vendor pages. The LLM is used only for generating the short personalized summary layer after the calculations are already complete.
 
-If I had a second week, I would spend most of it on turning the prototype into a genuinely launchable lead-gen product rather than adding more frontend surface area. The first priority would be persistence: a real database-backed audit creation flow, audit retrieval by `auditId`, and share pages that survive refresh and support Open Graph previews. Right now the UI implies virality, but the backend does not support it yet. Fixing that would immediately improve both product quality and submission quality.
+That reversal improved the product in two ways. First, the recommendations became easier to explain and validate. A reviewer can inspect the logic directly instead of trusting a black-box response from a model. Second, the failure mode became much safer. If the model fails or rate-limits, the audit itself still works and only the summary falls back to a template.
 
-The second major area would be pricing fidelity and recommendation breadth. I would replace the simplified catalog prices with a versioned pricing dataset sourced from official pricing pages, expand the rules for Gemini and Windsurf, and make API recommendations more concrete instead of relying on broad percentage optimizations. I would also add company size bands, primary use-case weighting, and “already well optimized” branches that are even more explicit and trustworthy.
+In hindsight this was the right trade-off. The core value of the product is trustworthy recommendations, not sounding intelligent.
 
-The third area would be lead capture and operations. I would add a backend for storing leads, transactional email via a server-side provider, rate limiting, abuse protection, and analytics instrumentation across landing, completion, share, and conversion steps. Finally, I would use the real user interviews to tighten the copy and reduce friction in the form. In week 1 I shipped the skeleton of the product. In week 2 I would make it durable, measurable, and credible enough to put real traffic through it.
+---
 
-## 5. How I used AI tools
+## 3. What I would build in week 2 if I had it
 
-I used AI tools as accelerators for structure, copy iteration, and implementation support, but not as final authority for pricing logic. The main tools I used were Codex and ChatGPT. I used them for brainstorming naming directions, refining landing-page language, improving UI structure, and moving faster on component-level implementation in React. I also used AI to help rewrite explanations into clearer user-facing language and to pressure-test whether certain sections of the app felt too generic.
+If I had a second week, I would focus less on adding new frontend features and more on making the product production-ready.
 
-What I did not trust AI with was the core audit reasoning. I deliberately kept the recommendation engine rule-based because the assignment values defensible logic over persuasive wording. I also did not trust AI to be correct about current pricing without verification. In a product like this, an elegant explanation built on bad pricing is worse than a plain explanation built on accurate inputs.
+The first priority would be finishing backend persistence properly. Right now the product generates unique audit URLs, but the share flow still depends too heavily on route state. I would fully persist audits in Firestore and hydrate public result pages directly from the database. That would also enable proper Open Graph previews and make the sharing loop work reliably.
 
-One specific time the AI was wrong and I caught it was around secret handling. An AI-assisted implementation path left the Gemini API key directly in `src/api/generateSummary.js`, which is fine for a quick local prototype but clearly unacceptable for a public submission. I caught that by reviewing the code as if it were production code rather than assuming the generated integration was acceptable. That was a good reminder that AI is useful for speed, but it does not own the security model, product judgment, or final review. I treated it as a collaborator, not a source of truth.
+The second priority would be improving pricing fidelity and recommendation depth. The current pricing catalog works well for the MVP, but I would expand the rules engine to support more edge cases, more API pricing scenarios, and better optimization logic for mixed-team usage patterns.
 
-## 6. Self-rating
+The third priority would be operational tooling. I would move all model calls behind server-side endpoints, add proper rate limiting, add transactional email infrastructure, and instrument analytics around audit completion, sharing, and consultation conversions.
 
-### Discipline
+I would also complete the automated test suite described in `TESTS.md`, especially around pricing logic and edge-case calculations. The audit engine is the highest-risk part of the application, so that is where the strongest test coverage belongs.
 
-**7/10** — I moved quickly from zero to a visible product flow, but the repo does not yet show the multi-day commit discipline the assignment explicitly asks for, so I would not rate this higher.
+---
 
-### Code quality
+## 4. How I used AI tools
 
-**6/10** — The code is readable and the audit logic is at least separated from the UI, but there are still major production issues such as client-side secrets, missing tests, and route-state dependence.
+I used AI tools primarily as accelerators for implementation speed, copy refinement, and UI iteration rather than as decision-makers. The main tools I used were ChatGPT, Codex, and Cursor.
 
-### Design sense
+I used them to brainstorm naming ideas, improve landing-page copy, speed up React component implementation, and pressure-test whether sections of the UI felt too generic or unclear. They were especially useful for helping restructure copy into cleaner user-facing language and reducing time spent on repetitive frontend work.
 
-**7/10** — The landing page and result page feel product-oriented rather than template-like, and I put attention into hierarchy, spacing, and the screenshot-worthiness of the savings output. There is still room to improve responsiveness and edge-case polish.
+What I did not trust AI with was the actual audit reasoning. The pricing recommendations are intentionally rule-based because pricing logic needs to be inspectable and defensible. I cross-checked pricing information manually against official vendor pricing pages instead of trusting generated responses.
 
-### Problem-solving
+One specific case where the AI was wrong was during an early Gemini integration attempt. The generated code left the API key directly in the source file instead of using environment variables properly. It also introduced an unused import that remained in the project after the integration path changed. I only caught both issues during a manual review pass.
 
-**7/10** — The strongest decision was recognizing that the problem is mostly about trustworthy business rules and product flow, not clever AI usage. The next step is showing the same rigor in persistence, testing, and reliability.
+That experience reinforced something important for me during this project: AI is very useful for acceleration, but it is unreliable as a final reviewer. I treated it as a collaborator, not as a source of truth.
 
-### Entrepreneurial thinking
+---
 
-**8/10** — I understood that the assignment is really a lead-generation product masquerading as an audit tool. The design tries to create value before gating, keep the result shareable, and use savings as the bridge into the Credex consultation path.
+## 5. Self-rating
 
+### Discipline — 7/10
+
+I worked consistently across multiple days, maintained a running devlog, and shipped a working end-to-end product within the assignment window. The biggest gap was underestimating the remaining backend work around persistence.
+
+### Code quality — 6/10
+
+The audit engine and UI structure are reasonably clean and separated well enough for an MVP, but there are still rough edges, unfinished infrastructure work, and places where refactoring would improve maintainability.
+
+### Design sense — 7/10
+
+I spent deliberate time on hierarchy, readability, and making the result page feel shareable rather than dashboard-like. The product feels more like a startup landing flow than a school project, although responsiveness and polish could still improve.
+
+### Problem-solving — 7/10
+
+The strongest technical decision was recognizing that deterministic pricing logic mattered more than maximizing AI usage. Catching the route-state persistence issue by simulating real user behavior was another useful lesson during debugging.
+
+### Entrepreneurial thinking — 8/10
+
+I approached the assignment as a lead-generation product rather than only a coding task. The flow is designed to provide immediate value first, surface savings clearly, and create a natural bridge into consultation or future conversion.
