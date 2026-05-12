@@ -48,7 +48,7 @@ I would also complete the automated test suite described in `TESTS.md`, especial
 
 ## 4. How I used AI tools
 
-I used AI tools primarily as accelerators for implementation speed, copy refinement, and UI iteration rather than as decision-makers. The main tools I used were ChatGPT, Codex, and Cursor.
+I used AI tools primarily as accelerators for implementation speed, copy refinement, and UI iteration rather than as decision-makers. The main tools I used were ChatGPT, Codex.
 
 I used them to brainstorm naming ideas, improve landing-page copy, speed up React component implementation, and pressure-test whether sections of the UI felt too generic or unclear. They were especially useful for helping restructure copy into cleaner user-facing language and reducing time spent on repetitive frontend work.
 
