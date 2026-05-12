@@ -23,16 +23,14 @@ SpendLens is a lightweight AI spend audit tool for startup founders and engineer
 - Multi-tool audit form for ChatGPT, Claude, GitHub Copilot, Gemini, Cursor, OpenAI API, Anthropic API, and Windsurf
 - Rule-based audit engine for plan downgrade and spend-gap recommendations
 - AI-generated summary with a templated fallback path
-- Shareable result route using a generated audit identifier in the URL
+- Firestore-backed shareable result route using a generated audit identifier in the URL
 - Email send flow from the result page using EmailJS
 
 ## What is not complete yet
 
-- No persistent backend storage — audits are passed via router state, 
-  so refreshing the result page loses the audit payload
-- Share URLs are not truly persistent — the URL looks shareable but 
-  only works within the same session
-- No Open Graph metadata per audit yet
+- Lead capture is not stored in a real backend yet
+- Open Graph metadata per audit is not implemented yet
+- Secrets and AI integrations still run client-side, which is acceptable for a prototype but not for production
 - No automated test suite — tests are planned but not implemented
 
 ## Quick start
@@ -71,5 +69,5 @@ This project is a Vite React SPA and can be deployed to Vercel, Netlify, Cloudfl
 
 - Add the real deployed URL and demo assets above
 - Replace all hardcoded secrets with environment variables
-- Add persistent storage for leads and audit payloads
+- Move audit and lead persistence behind a server-backed flow
 - Add tests and CI before calling the project submission-ready
