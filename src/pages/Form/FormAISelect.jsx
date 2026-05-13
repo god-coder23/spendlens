@@ -231,6 +231,10 @@ const FormAISelect = () => {
   }
 
   const handleGenerateAudit = async () => {
+    if (isLoading) {
+      return
+    }
+
     try {
       setIsLoading(true)
       const auditId = nanoid(8)
@@ -431,7 +435,7 @@ const FormAISelect = () => {
             <button
               type="button"
               onClick={handleGenerateAudit}
-              disabled={selectedTools.length === 0}
+              disabled={selectedTools.length === 0 || isLoading}
               className='w-full md:w-[80%] h-fit px-1 py-3 rounded-lg bg-green-900 gap-3 flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
             >
               <h1 className='text-white'>Continue to audit</h1>
