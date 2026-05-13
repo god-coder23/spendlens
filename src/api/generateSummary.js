@@ -54,7 +54,7 @@ export const generateSummary = async (userInput, auditResult) => {
     })
 
     return response.text || buildLocalSummary(userInput, auditResult)
-  } catch (err) {
+  } catch {
     console.warn("Gemini summary unavailable, using local summary instead.")
     return buildLocalSummary(userInput, auditResult)
   }
