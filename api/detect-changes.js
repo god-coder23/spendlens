@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { initializeApp, cert, getApps } from "firebase-admin/app"
 import { getFirestore } from "firebase-admin/firestore"
 import { Resend } from "resend"
