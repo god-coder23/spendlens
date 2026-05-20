@@ -28,10 +28,16 @@ The Round 1 version only helped at the moment the user clicked submit. That brea
 8. Open the email and click through to `/audit/:id/diff`.
 9. Confirm the diff page shows old vs updated savings and the recommendation change for the affected tool.
 
+Final preview verification on my branch returned:
+- `affectedAudits: 5`
+- `affectedUsers: 1`
+- `emailsSent: 1`
+- `sendFailures: 0`
+
 ## What's tested
 - Existing audit engine tests still pass: `npm test`
 - Lint passes for the new server route and diff page
-- I manually tested the saved-audit flow, the detection route, and the diff page wiring
+- I manually tested the saved-audit flow, the detection route, and the diff page wiring on the deployed preview branch
 - I did not add a mocked Firestore or mocked Resend test in this round
 
 ## Open questions / risks

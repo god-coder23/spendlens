@@ -24,3 +24,6 @@ Compared the implementation back to the brief and found two important misses: I 
 
 ## 2026-05-20 20:30 — Final pass
 Ran lint and existing tests again. Cleaned up the Round 2 writeups so they match the implementation instead of describing an earlier version. At this point the core path is the one the rubric cares about: saved audit -> pricing change detection -> email -> diff view.
+
+## 2026-05-20 21:40 — Preview-only blocker and final verification
+The preview deployment still crashed even after the local code looked clean. Pulled the Vercel function logs and found the real issue: the serverless runtime could not resolve local ESM imports without explicit `.js` extensions. Fixed the import paths in the audit engine files, forced a fresh preview deployment, and re-ran `/api/detect-changes` on the preview URL. Final response showed `affectedAudits: 5`, `affectedUsers: 1`, `emailsSent: 1`, and `sendFailures: 0`, which confirmed the server-side detection and email path were working on the deployed branch, not just locally.
