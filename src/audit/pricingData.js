@@ -1,7 +1,7 @@
 export const pricingData = {
   chatgpt: {
     free: 0,
-    plus: 100,
+    plus: 20,
     team: 25,
     business: 25,
     enterprise: null 
