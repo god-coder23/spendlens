@@ -63,13 +63,41 @@ export default async function handler(req, res) {
     const resend = new Resend(process.env.RESEND_API_KEY)
     const snapshot = await db.collection("audits").get()
     const emailsToSend = []
+    const debug = {
+      totalAudits: snapshot.size,
+      auditsWithoutEmail: 0,
+      auditsWithoutSnapshot: 0,
+      auditsWithoutTools: 0,
+      unchangedAudits: 0,
+      matchedAudits: 0,
+      sendAttempts: 0,
+      sendFailures: 0
+    }
 
     snapshot.forEach((doc) => {
       const { userEmail, pricingSnapshot, userInput } = doc.data()
-      if (!userEmail || !pricingSnapshot) return
+      const tools = userInput?.tools
+
+      if (!userEmail) {
+        debug.auditsWithoutEmail += 1
+        console.log(`[detect-changes] skipping ${doc.id}: missing userEmail`)
+        return
+      }
+
+      if (!pricingSnapshot) {
+        debug.auditsWithoutSnapshot += 1
+        console.log(`[detect-changes] skipping ${doc.id}: missing pricingSnapshot`)
+        return
+      }
+
+      if (!Array.isArray(tools) || tools.length === 0) {
+        debug.auditsWithoutTools += 1
+        console.log(`[detect-changes] skipping ${doc.id}: missing userInput.tools`)
+        return
+      }
 
       const changes = []
-      userInput?.tools?.forEach((tool) => {
+      tools.forEach((tool) => {
         const key = keyMap[tool.tool]
         if (!key) return
         const oldPrice = pricingSnapshot[key]?.[tool.plan]
@@ -80,29 +108,43 @@ export default async function handler(req, res) {
       })
 
       if (changes.length > 0) {
+        debug.matchedAudits += 1
+        console.log(`[detect-changes] matched ${doc.id} for ${userEmail}: ${changes.join(", ")}`)
         emailsToSend.push({ email: userEmail, auditId: doc.id, changes })
+      } else {
+        debug.unchangedAudits += 1
+        console.log(`[detect-changes] no price changes for ${doc.id}`)
       }
     })
 
     for (const { email, auditId, changes } of emailsToSend) {
-      await resend.emails.send({
-        from: "SpendLens <onboarding@resend.dev>",
-        to: email,
-        subject: "AI prices changed — your audit is outdated",
-        html: `
-          <p>These prices changed since your audit:</p>
-          <p>${changes.join("<br/>")}</p>
-          <a href="${appUrl}/audit/${auditId}/diff">
-            Click here to see updated audit
-          </a>
-        `
-      })
+      debug.sendAttempts += 1
+      try {
+        const sendResult = await resend.emails.send({
+          from: "SpendLens <onboarding@resend.dev>",
+          to: email,
+          subject: "AI prices changed — your audit is outdated",
+          html: `
+            <p>These prices changed since your audit:</p>
+            <p>${changes.join("<br/>")}</p>
+            <a href="${appUrl}/audit/${auditId}/diff">
+              Click here to see updated audit
+            </a>
+          `
+        })
+        console.log(`[detect-changes] email sent for ${auditId} to ${email}`, sendResult)
+      } catch (sendError) {
+        debug.sendFailures += 1
+        console.error(`[detect-changes] email failed for ${auditId} to ${email}`, sendError)
+      }
     }
 
     return res.status(200).json({
       appUrl,
       auditsChecked: snapshot.size,
-      emailsSent: emailsToSend.length
+      emailsQueued: emailsToSend.length,
+      emailsSent: debug.sendAttempts - debug.sendFailures,
+      debug
     })
   } catch (error) {
     console.error("detect-changes failed", error)
