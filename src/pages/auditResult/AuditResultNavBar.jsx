@@ -7,11 +7,8 @@ import { getAudit } from '../../service/auditService'
 const AuditResultNavBar = () => {
   const { id } = useParams()
   const location = useLocation()
-  const [auditPayload, setAuditPayload] = useState(location.state || null)
-  const [isLoadingAudit, setIsLoadingAudit] = useState(!location.state)
-
- const [auditPayload, setAuditPayload] = useState(
-    location.state?.auditResult && location.state?.userInput ? location.state : null
+  const [auditPayload, setAuditPayload] = useState(
+  location.state?.auditResult && location.state?.userInput ? location.state : null
   )
   const [isLoadingAudit, setIsLoadingAudit] = useState(
     !(location.state?.auditResult && location.state?.userInput)
