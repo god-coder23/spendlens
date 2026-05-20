@@ -1,5 +1,5 @@
-import { pricingData } from "./pricingData"
-import { calculateAnnualSavings } from "./helper"
+import { pricingData } from "./pricingData.js"
+import { calculateAnnualSavings } from "./helper.js"
 
 const hasEnteredSpend = (tool) =>
   typeof tool.spend === "number" && !Number.isNaN(tool.spend) && tool.spend > 0

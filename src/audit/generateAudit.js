@@ -1,4 +1,4 @@
-import {evaluateAnthropicRule, evaluateChatGPTRule, evaluateClaudeRule, evaluateCopilotRule, evaluateCursorRule, evaluateGeminiRule, evaluateOpenAIRule, evaluateWindsurfRule } from "./rules"
+import {evaluateAnthropicRule, evaluateChatGPTRule, evaluateClaudeRule, evaluateCopilotRule, evaluateCursorRule, evaluateGeminiRule, evaluateOpenAIRule, evaluateWindsurfRule } from "./rules.js"
 
 export const generateAudit = (userInput) => {
   const recommendations = []
