@@ -1,0 +1,11 @@
+## 1. Most uncomfortable trade-off due to time pressure
+
+The most uncomfortable trade-off was shipping the server-side change-detection and email path without adding dedicated automated tests for it. I was comfortable leaving the older audit-engine tests as they were, but I was not fully comfortable with a route that reads Firestore, re-runs audit logic, groups audits by user, and sends real emails being validated mostly by manual testing. I still made that trade-off because the assignment weights a working end-to-end feature heavily, and without the actual persistence -> detection -> email -> diff path working, the cleaner testing story would not have mattered much. If I had tried to do both properly inside the same 36-hour window, I was more likely to ship a half-finished feature than a real one.
+
+## 2. If the deadline was extended by 24 hours, the first thing I'd do
+
+The first thing I would do is add a focused test file for `api/detect-changes.js` with mocked Firestore data and a mocked Resend client. I would cover three cases only: unchanged audit does not queue mail, changed audit does queue mail, and multiple affected audits for the same user collapse into one consolidated email. That is the highest-risk code in the Round 2 addition because it combines business logic with side effects. After that, I would be much more confident that changing pricing data or tweaking recommendation logic would not accidentally spam people or miss valid stale audits.
+
+## 3. What my Round 1 self made harder for my Round 2 self
+
+My Round 1 self made this harder by treating the app as purely client-side. That was a reasonable choice for a prototype audit generator, but it meant there was no established server-side pattern at all when Round 2 suddenly needed one. I had to introduce Vercel serverless functions, `firebase-admin`, server-only env handling, and Resend in the same round that I was also trying to build the actual feature. If I had added even one thin backend endpoint in Round 1, the mental overhead in Round 2 would have been much lower. The frontend audit flow itself was not the hard part; the hard part was extending a codebase that had never needed trusted server execution before.
