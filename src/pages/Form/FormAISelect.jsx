@@ -13,6 +13,7 @@ import { generateAudit } from "../../audit/generateAudit"
 import { generateSummary } from "../../api/generateSummary"
 import { saveAudit } from "../../service/auditService"
 import Loading from '../Loading'
+import { pricingData } from "../../audit/pricingData"
 
 const usageOptions = [
   { label: "Coding", value: "coding", icon: Code },
@@ -153,6 +154,7 @@ const FormAISelect = () => {
   const [extraInfo, setExtraInfo] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const [email, setEmail] = useState("")
 
   const activeToolConfig = activeToolName
     ? toolConfigurations[activeToolName] || createDefaultToolConfig(activeToolName)
@@ -279,7 +281,10 @@ const FormAISelect = () => {
 
       await saveAudit(auditId, {
         auditResult,
-        userInput
+        userInput,
+        userEmail: email,  
+        pricingSnapshot: pricingData,
+        createdAt: new Date().toISOString()
       })
 
       navigate(`/audit/${auditId}`, {
@@ -432,6 +437,15 @@ const FormAISelect = () => {
           </div>
 
           <div className='flex justify-center items-center mt-2'>
+            <div className='flex w-screen justify-center items-center mt-2'>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email (to get notified when prices change)"
+                  className="w-full md:w-[80%] border px-4 py-3 rounded-xl border-black/20 outline-none text-sm mb-3"
+                />
+            </div>
             <button
               type="button"
               onClick={handleGenerateAudit}

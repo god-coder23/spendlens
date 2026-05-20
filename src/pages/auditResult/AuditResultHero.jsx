@@ -298,7 +298,7 @@ const AuditResultHero = ({ userInput, auditResult }) => {
             </div>
             <div className='mt-4 flex items-start gap-2 rounded-2xl bg-gray-50 p-3 text-sm text-gray-500'>
               <TriangleAlert className='mt-0.5 h-4 w-4 shrink-0' />
-              AI summaries can be imperfect, so it&apos;s worth reviewing the recommendations above before making plan changes.
+              AI summaries can be imperfect, so it's worth reviewing the recommendations above before making plan changes.
             </div>
           </section>
 

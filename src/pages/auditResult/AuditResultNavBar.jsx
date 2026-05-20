@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { CircleArrowOutUpRight, Drone, MoveLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import AuditResultHero from './AuditResultHero'
@@ -77,7 +76,7 @@ const AuditResultNavBar = () => {
           <div>
             <h2 className='text-3xl font-semibold text-gray-900'>Audit data not found</h2>
             <p className='mt-3 text-sm leading-6 text-gray-600'>
-              We couldn&apos;t find this audit in the shared link store. The link may be invalid, or the audit may not have been saved successfully.
+              We couldn't find this audit in the shared link store. The link may be invalid, or the audit may not have been saved successfully.
             </p>
           </div>
           <Link to="/audit" className='inline-flex w-fit items-center gap-2 rounded-2xl bg-green-900 px-5 py-3 font-medium text-white'>
